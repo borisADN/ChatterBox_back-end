@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SendMessageRequest;
+use App\Models\GroupMessage;
+use App\Models\GroupsMessages;
 use App\Models\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -84,5 +86,112 @@ public function getAllMessages () {
     $messages = Messages::all();
     return response()->json(['messages' => $messages]);
 }
+
+public function SendGroupMessage (Request $request) {
+    //   return response()->json(['messages' => $request->all()]);
+    $message = new GroupMessage ();
+    $message->group_id = $request->group_id;
+    $message->sender_id = $request->sender_id;
+    $message->message = $request->message;
+    $message->file = $request->file;
+    $message->save();
+    return response()->json(['message' => 'Message sent successfully.']);
+}
+
+public function getGroupMessages(Request $request)
+{
+    // Valider l'ID du groupe
+    $request->validate([
+        'group_id' => 'required|integer', // ID du groupe à valider
+    ]);
+
+    // Récupérer les messages du groupe
+    $groupMessages = GroupMessage::where('group_id', $request->group_id)
+                        ->orderBy('created_at', 'asc') // Trier par ordre chronologique
+                        ->get();
+
+    // Vérifier si des messages ont été trouvés pour le groupe donné
+    if ($groupMessages->isEmpty()) {
+        return response()->json([
+            'message' => 'No messages found for this group.',
+        ], 404);
+    }
+
+    // Retourner les messages en réponse JSON
+    return response()->json([
+        'messages' => $groupMessages,
+    ], 200);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public function SendGroupMessag(Request $request)
+{
+    // Valider les données reçues
+    $request->validate([
+        'group_id' => 'required|integer', // ID du groupe
+        'sender_id' => 'required|integer', // ID de l'utilisateur qui envoie le message
+        'message' => 'nullable|string', // Le contenu du message, peut être nul s'il y a un fichier
+        'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,txt|max:2048' // Validation du fichier
+    ]);
+
+    // Créer une nouvelle instance de message de groupe
+    $message = new GroupMessage();
+    $message->group_id = $request->group_id;
+    $message->sender_id = $request->sender_id;
+    $message->message = $request->message;
+
+    // Gestion du fichier (s'il y en a un)
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/group_files'), $filename);
+        $message->file = $filename; // Sauvegarder le nom du fichier dans la base de données
+    }
+
+    // Sauvegarder le message dans la base de données
+    $message->save();
+
+    // Retourner une réponse JSON pour indiquer le succès de l'opération
+    return response()->json([
+        'message' => 'Message sent successfully.',
+        'data' => $message
+    ], 200);
+}
+
+
+
+// public function searchMessage ($search) {
+//     $messages = Messages::where('message', 'LIKE', '%'.$search.'%')->get();
+//     return response()->json(['messages' => $messages]);
+// }
+
+
+
+
+
+
+
 
 }
