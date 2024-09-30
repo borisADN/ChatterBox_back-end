@@ -5,20 +5,19 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvitationMail extends Mailable
+class NewUser extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    // public function __construct()
-    public function __construct( private $email, private $group_name)
+    public function __construct(private $email, private $group_name)
     {
         //
     }
@@ -39,11 +38,10 @@ class InvitationMail extends Mailable
      */
     public function content(): Content
     {
-
         return new Content(
-            view: 'mail.invitation',
-            with: ['groupName' => $this->group_name,
-            'email' => $this->email,],
+            view: 'mail.newUser',
+            with: ['email' => $this->email,
+        'group_name' => $this->group_name],
             
         );
     }
@@ -58,4 +56,3 @@ class InvitationMail extends Mailable
         return [];
     }
 }
-

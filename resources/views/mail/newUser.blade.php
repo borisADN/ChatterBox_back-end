@@ -7,11 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-    {{$email }} Vient  de vous ajouter au groupe  {{ $groupName }} sur ChatterBox.
-
-    <small> L'equipe de chatterbox</small>
-
-  
-    <p>Pour vous inscrire, veuillez cliquer sur ce lien : <a href="">Inscription</a></p> 
+    Salut les amis , {{$email}} vient d'envoyer un nouveau fichier dans le groupe {{ $group_name }} sur ChatterBox. <br>
+    Connectez vous pour l'accueillir comme ca se doit !
 </body>
 </html>

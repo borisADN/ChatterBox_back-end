@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SendMessageRequest;
+use App\Mail\NewFile;
+use App\Models\Group;
 use App\Models\GroupMessage;
 use App\Models\GroupsMessages;
 use App\Models\Messages;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class MessageController extends Controller
 {
@@ -49,19 +53,6 @@ public function getMessages(Request $request) {
     ]);
     return response()->json(['messages' => $request]);
 
-    
-    $messages = Messages::where(function($query) use ($request) {
-            $query->where('outgoing_msg_id', $request->outgoing_msg_id)
-                  ->where('incoming_msg_id', $request->incoming_msg_id);
-        })
-        ->orWhere(function($query) use ($request) {
-            $query->where('outgoing_msg_id', $request->outgoing_msg_id)
-                  ->where('incoming_msg_id', $request->incoming_msg_id);
-        })
-        ->orderBy('created_at', 'asc')
-        ->get();
-
-
 }
 
 // Affiche tous les messages entre les deux utilisateurs
@@ -88,14 +79,56 @@ public function getAllMessages () {
 }
 
 public function SendGroupMessage (Request $request) {
+    // Validate incoming request
+      $request->validate([
+          'group_id' =>'required|integer',
+          'sender_id' =>'required|integer',
+          'message' =>'nullable|string|max:255',
+          'file' => 'nullable|file|max:10240', // 10MB maximum
+      ]);
+
     //   return response()->json(['messages' => $request->all()]);
     $message = new GroupMessage ();
     $message->group_id = $request->group_id;
     $message->sender_id = $request->sender_id;
     $message->message = $request->message;
     $message->file = $request->file;
+    
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $filename = $file->getClientOriginalName();
+        $file->move(public_path('uploads/sendGroupFile'), $filename);
+        $message->file = $filename;
+        $sender = User::find($request->sender_id);
+
+    $Crew = Group::find($request->group_id);
+
+        $Gmembers = DB::table('members')
+        ->join('users', 'members.member_id', '=', 'users.id')
+        ->where('members.group_id', $request->group_id)
+        ->where('users.email', '!=', $sender->email)
+        ->select('users.name', 'users.email', ) // Sélectionner uniquement les colonnes nécessaires
+        ->get();
+        foreach ($Gmembers as $Gmember) {
+            
+            Mail::to($Gmember->email)->send(new NewFile($request->email, $Crew->name));
+        }        
+    }
     $message->save();
-    return response()->json(['message' => 'Message sent successfully.']);
+
+    return response()->json([
+        'message' => 'Message envoyé avec succès.',
+        'data' => [
+            'id' => $message->id,
+            'group_id' => $message->group_id,
+            'sender_id' => $message->sender_id,
+            'sender_name' => $sender->name, // Assurez-vous que le modèle User a un champ 'name'
+            'message' => $message->message,
+            'file' => $message->file,
+            'created_at' => $message->created_at, // Ajout de la date de création si nécessaire
+        ]
+    ]);
+
 }
 
 public function getGroupMessages(Request $request)
@@ -116,7 +149,6 @@ public function getGroupMessages(Request $request)
             'message' => 'No messages found for this group.',
         ], 404);
     }
-
     // Retourner les messages en réponse JSON
     return response()->json([
         'messages' => $groupMessages,
