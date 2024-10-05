@@ -97,7 +97,8 @@ class GroupController extends Controller
         // Récupère tous les groupes dans lesquels le membre est membre
         $groups = Group::join('members', 'groups.id', '=', 'members.group_id')
             ->where('members.member_id', $userId)
-            ->get(['groups.*']); // Sélectionne toutes les colonnes de la table 'groups'
+            ->get(['groups.*']);
+             // Sélectionne toutes les colonnes de la table 'groups'
 
         return response()->json([
             'groups' => $groups,
@@ -129,7 +130,7 @@ class GroupController extends Controller
         $request->validate([
             'group_id' => 'required|integer',
             'email' => 'required|email',
-            'id' => 'required|string'
+            // 'id' => 'required|string'
         ]);
 
         $groupId = $request->group_id;
@@ -145,7 +146,7 @@ class GroupController extends Controller
         // Vérifier si l'utilisateur existe
         $user = DB::table('users')->where('email', $email)->first();
         if ($user) {
-            return response()->json(['message' => 'Cet utilisateur est déjà inscrit'], 404);
+            return response()->json(['message' => 'Cet utilisateur est déjà inscrit'], 200);
         }else{
             //avoir les infos sur ce groupe 
             $groupInfo = DB::table('groups')->where('id', $groupId)->first();
@@ -193,4 +194,28 @@ $invite->save();
             'members' => $members,  // Liste des membres du groupe
         ], 200);
     }
+
+    public function CountMembersOfAGroup(Request $request) {
+        try {
+            $request->validate([
+                'group_id' => 'required|integer|exists:groups,id',
+            ]);
+    
+            $count = DB::table('members')
+                ->where('group_id', $request->group_id)
+                ->count();
+    
+            return response()->json([
+                'count' => $count,
+            ], 200);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Une erreur s\'est produite',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+    
 }

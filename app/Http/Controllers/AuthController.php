@@ -12,7 +12,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
-use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller

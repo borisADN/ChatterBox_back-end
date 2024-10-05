@@ -28,7 +28,7 @@ class AccountMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Notification pour Inscription sur ChatterBox',
+            subject: 'Notification pour Inscription sur FilesShare',
             from: new Address('accounts@unetah.net', 'no reply '),
         );
     }

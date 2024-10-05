@@ -93,13 +93,15 @@ public function SendGroupMessage (Request $request) {
     $message->sender_id = $request->sender_id;
     $message->message = $request->message;
     $message->file = $request->file;
+    $sender = User::find($request->sender_id);
     
     if ($request->hasFile('file')) {
         $file = $request->file('file');
         $filename = $file->getClientOriginalName();
         $file->move(public_path('uploads/sendGroupFile'), $filename);
         $message->file = $filename;
-        $sender = User::find($request->sender_id);
+
+        // return response()->json(['sender ' =>$sender]);
 
     $Crew = Group::find($request->group_id);
 
@@ -111,7 +113,7 @@ public function SendGroupMessage (Request $request) {
         ->get();
         foreach ($Gmembers as $Gmember) {
             
-            Mail::to($Gmember->email)->send(new NewFile($request->email, $Crew->name));
+            Mail::to($Gmember->email)->send(new NewFile($sender->email, $Crew->name));
         }        
     }
     $message->save();
@@ -122,7 +124,7 @@ public function SendGroupMessage (Request $request) {
             'id' => $message->id,
             'group_id' => $message->group_id,
             'sender_id' => $message->sender_id,
-            'sender_name' => $sender->name, // Assurez-vous que le modèle User a un champ 'name'
+            'sender' => "Someone", // Assurez-vous que le modèle User a un champ 'name'
             'message' => $message->message,
             'file' => $message->file,
             'created_at' => $message->created_at, // Ajout de la date de création si nécessaire
@@ -140,8 +142,10 @@ public function getGroupMessages(Request $request)
 
     // Récupérer les messages du groupe
     $groupMessages = GroupMessage::where('group_id', $request->group_id)
-                        ->orderBy('created_at', 'asc') // Trier par ordre chronologique
+                        ->orderBy('created_at', 'asc') 
+                        ->take(20)// Trier par ordre chronologique
                         ->get();
+                        
 
     // Vérifier si des messages ont été trouvés pour le groupe donné
     if ($groupMessages->isEmpty()) {

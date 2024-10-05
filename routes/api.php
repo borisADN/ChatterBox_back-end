@@ -26,7 +26,6 @@ Route::post('/trial', function (Request $request) {
 
 Route::post('/register',[AuthController::class, 'handle_register']);
 Route::post('/login', [AuthController::class, 'handle_login']);
-Route::post('/delete',[AuthController::class, 'handle_register']);
 route::get('/delete/{id}', [AuthController::class, 'delete_user']);
 route::get('/all_users', [AuthController::class, 'List_user']);
 
@@ -40,6 +39,7 @@ Route::post('/AddMember', [GroupController::class, 'AddMember']);
 Route::post('/SelectGroups', [GroupController::class, 'SelectGroupOfaMember']);
 route::post('/ListGroups', [GroupController::class, 'memberListForAGroup']);
 route::post('/InviteMember', [GroupController::class, 'inviteMember']);
+route::post('/countMembers', [GroupController::class, 'CountMembersOfAGroup']);
 
 Route::post('/SendMessageGroup', [MessageController::class, 'SendGroupMessage']);
 Route::post('/getGroupMessages', [MessageController::class, 'getGroupMessages']);
