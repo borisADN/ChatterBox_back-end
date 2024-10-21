@@ -55,7 +55,6 @@ public function getMessages(Request $request) {
 
 }
 
-// Affiche tous les messages entre les deux utilisateurs
 public function displayMessages (Request $request) {
     $messages = DB::table('messages')
     ->where(function ($query) use ($request) {

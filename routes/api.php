@@ -28,6 +28,8 @@ Route::post('/register',[AuthController::class, 'handle_register']);
 Route::post('/login', [AuthController::class, 'handle_login']);
 route::get('/delete/{id}', [AuthController::class, 'delete_user']);
 route::get('/all_users', [AuthController::class, 'List_user']);
+route::get('/getCurrent/{id}', [AuthController::class, 'CurrentUser']);
+route::post('/updateUser/{id}', [AuthController::class, 'update_user']);
 
 route::post('/sendMessage', [MessageController::class, 'sendMessage']);
 route::post('/sendFile', [MessageController::class, 'sendFile']);

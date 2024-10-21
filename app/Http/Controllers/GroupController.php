@@ -124,7 +124,6 @@ class GroupController extends Controller
             'message' => 'Member deleted successfully',
         ], 200);
     }
-
     public function InviteMember(Request $request){
 
         $request->validate([
@@ -167,7 +166,6 @@ $invite->save();
             'message' => 'Invitation envoyée',
         ], 200); 
     }
-
     public function memberListForAGroup(Request $request)
     {
         //  return response()->json(['messages' => $request->all()]);
@@ -194,7 +192,6 @@ $invite->save();
             'members' => $members,  // Liste des membres du groupe
         ], 200);
     }
-
     public function CountMembersOfAGroup(Request $request) {
         try {
             $request->validate([
