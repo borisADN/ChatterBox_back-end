@@ -30,6 +30,9 @@ route::get('/delete/{id}', [AuthController::class, 'delete_user']);
 route::get('/all_users', [AuthController::class, 'List_user']);
 route::get('/getCurrent/{id}', [AuthController::class, 'CurrentUser']);
 route::post('/updateUser/{id}', [AuthController::class, 'update_user']);
+route::post('ForgotPassword', [AuthController::class, 'Forgotten_password']);
+route::post('VerifyOTP', [AuthController::class, 'Verify_otp']);
+route::post('ResetPassword', [AuthController::class, 'Reset_password']);
 
 route::post('/sendMessage', [MessageController::class, 'sendMessage']);
 route::post('/sendFile', [MessageController::class, 'sendFile']);

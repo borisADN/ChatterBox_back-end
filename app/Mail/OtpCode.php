@@ -3,21 +3,20 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AccountMail extends Mailable
+class OtpCode extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(private $name)
+    public function __construct(private $code)
     {
         //
     }
@@ -39,10 +38,9 @@ class AccountMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.message',
-            with : [
-                'name' =>   $this->name,
-            ]
+            view: 'mail.otpCode',
+            with: [ 'code' => $this->code],
+            
         );
     }
 
